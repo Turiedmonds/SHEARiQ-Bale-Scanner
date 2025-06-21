@@ -1,7 +1,7 @@
 {
   "name": "SHEΔR iQ Bale Scanner",
   "short_name": "SHEΔR iQ",
-  "start_url": "./SHEAR iQ Bale Scanner - Beta.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#000000",
