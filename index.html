@@ -489,8 +489,7 @@ function deleteLastEntry() {
   logTable.removeChild(lastRow);
   sessionCount = Math.max(0, sessionCount - 1);
   baleCount = Math.max(0, baleCount - 1);
-  storeBaleCount(document.getElementById("station").value.trim(), baleCount);
-  updateDisplays();
+ storeBaleCount(document.getElementById("station").value.trim(), baleCount);
 
 }
 
