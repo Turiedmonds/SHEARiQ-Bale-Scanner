@@ -348,7 +348,11 @@ function formatDate(date){
 }
 let csvRows=[];
 let csvSessionDate=formatDate(new Date());
-function getStoredBaleCount(farmName) {
+function storeCsvData() {
+  localStorage.setItem('csvRows', JSON.stringify(csvRows));
+  localStorage.setItem('csvSessionDate', csvSessionDate);
+}
+  function getStoredBaleCount(farmName) {
   const key = "lastBale_" + farmName.toLowerCase();
   const stored = localStorage.getItem(key);
   return stored ? parseInt(stored) + 1 : null;
@@ -396,6 +400,7 @@ function resetThisFarmSession() {
   updateDisplays();
 
   alert(`Reset complete for "${farmNameInput}". All bale data cleared for this farm.`);
+storeCsvData();
 }
 
 function updateDisplays() {
@@ -421,6 +426,7 @@ function logBale(qrText) {
   baleCount++;
   updateDisplays();
   updateWoolTypeTotals(qrText.trim());
+storeCsvData();
 }
 
 function startQRScan() {
@@ -501,6 +507,7 @@ const farmName = document.getElementById("station").value.trim();
 storeBaleCount(farmName, baleCount > 0 ? baleCount - 1 : 0);
 updateDisplays();
 console.log("Saving to storage:", farmName, "with bale count:", baleCount);
+storeCsvData();
 }
 function exportCSV() {
   const rows = [["#", "Wool Type", "Presser", "Farm", "Timestamp"], ...csvRows];
@@ -545,6 +552,7 @@ function resetAllFarms() {
   updateDisplays();
 
   alert("All farm bale counts have been reset.");
+storeCsvData();
 }
 
 </script>
@@ -582,6 +590,33 @@ function updateWoolTypeTotals(woolType) {
   }
 }
 
+ </script>
+<script>
+window.addEventListener('load', function() {
+  const today = formatDate(new Date());
+  const storedDate = localStorage.getItem('csvSessionDate');
+  if (storedDate === today) {
+    const storedRows = JSON.parse(localStorage.getItem('csvRows') || '[]');
+    csvRows = storedRows;
+    const table = document.getElementById('logTable').querySelector('tbody');
+    table.innerHTML = '';
+    storedRows.forEach(r => {
+      const row = table.insertRow();
+      r.forEach(val => {
+        row.insertCell().textContent = val;
+      });
+      updateWoolTypeTotals(r[1].trim());
+    });
+    sessionCount = storedRows.length;
+    baleCount = storedRows.length > 0 ? parseInt(storedRows[storedRows.length-1][0]) + 1 : baleCount;
+    baleCountSet = storedRows.length > 0;
+    csvSessionDate = storedDate;
+    updateDisplays();
+  } else {
+    localStorage.removeItem('csvRows');
+    localStorage.setItem('csvSessionDate', today);
+  }
+}); 
 </script>
     <script>
   if ('serviceWorker' in navigator) {
