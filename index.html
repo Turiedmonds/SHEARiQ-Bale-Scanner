@@ -491,7 +491,7 @@ function deleteLastEntry() {
   baleCount = Math.max(0, baleCount - 1);
   storeBaleCount(document.getElementById("station").value.trim(), baleCount);
   updateDisplays();
-
+  console.log("Saving to storage:", farmName, "with bale count:", baleCount);
 }
 
 function exportCSV() {
