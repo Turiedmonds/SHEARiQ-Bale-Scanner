@@ -494,20 +494,34 @@ function deleteLastEntry() {
   console.log("Saving to storage:", farmName, "with bale count:", baleCount);
 }
 
-function exportCSV() {
-  const rows = [["#", "Wool Type", "Presser", "Farm", "Timestamp"]];
-  const table = document.getElementById("logTable").querySelector("tbody");
-  for (let row of table.rows) {
-    let cells = Array.from(row.cells).map(cell => cell.textContent);
-    rows.push(cells);
-  }
-  const csvContent = rows.map(e => e.join(",")).join("\n");
-  const blob = new Blob([csvContent], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.setAttribute("href", url);
-  a.setAttribute("download", "bale_log.csv");
-  a.click();
+function exportCSV()
+{const rows = [["#", "Wool Type", "Presser", "Farm", "Timestamp"]];
+const table = document.getElementById("logTable").querySelector("tbody");
+for (let row of table.rows) {
+  let cells = Array.from(row.cells).map(cell => cell.textContent);
+  rows.push(cells);
+}
+
+// Add Wool Type Totals
+rows.push([]);
+rows.push(["--- Wool Type Totals ---"]);
+rows.push(["Wool Type", "Total Bales"]);
+
+const totalsTable = document.getElementById("woolTypeTotals").querySelector("tbody");
+for (let row of totalsTable.rows) {
+  const woolType = row.cells[0].textContent;
+  const count = row.cells[1].textContent;
+  rows.push([woolType, count]);
+}
+
+// ✅ Now convert after everything has been added
+const csvContent = rows.map(e => e.join(",")).join("\n");
+const blob = new Blob([csvContent], { type: "text/csv" });
+const url = URL.createObjectURL(blob);
+const a = document.createElement("a");
+a.setAttribute("href", url);
+a.setAttribute("download", "bale_log.csv");
+a.click();
 }
 
 function resetAllFarms() {
