@@ -389,6 +389,7 @@ function resetThisFarmSession() {
   baleCount = 0;
   sessionCount = 0;
   baleCountSet = false;
+ localStorage.removeItem("sessionStart");
   updateDisplays();
 
   alert(`Reset complete for "${farmNameInput}". All bale data cleared for this farm.`);
@@ -402,7 +403,16 @@ function updateDisplays() {
 
 function logBale(qrText) {
   playFeedback();
+    // Insert marker row if it's the first log after reload (but not after reset)
+if (sessionCount === 0 && logTable.rows.length > 0) {
   const table = document.getElementById("logTable").querySelector("tbody");
+  const markerRow = table.insertRow();
+  const cell = markerRow.insertCell();
+  cell.colSpan = 5;
+  cell.textContent = "—— New Session ——";
+  cell.style.fontStyle = "italic";
+  cell.style.color = "gray";
+}
   const row = table.insertRow();
   row.insertCell(0).textContent = baleCount;
   row.insertCell(1).textContent = qrText;
@@ -412,7 +422,11 @@ function logBale(qrText) {
   sessionCount++;
   storeBaleCount(document.getElementById("station").value.trim(), baleCount);
   baleCount++;
-  updateDisplays();
+  if (!localStorage.getItem("sessionStart")) {
+  const start = new Date().toISOString();
+  localStorage.setItem("sessionStart", start);
+}
+    updateDisplays();
   updateWoolTypeTotals(qrText.trim());
 }
 
@@ -519,8 +533,10 @@ const csvContent = rows.map(e => e.join(",")).join("\n");
 const blob = new Blob([csvContent], { type: "text/csv" });
 const url = URL.createObjectURL(blob);
 const a = document.createElement("a");
-a.setAttribute("href", url);
-a.setAttribute("download", "bale_log.csv");
+const stationName = document.getElementById("station").value.trim();
+const sessionStart = new Date(localStorage.getItem("sessionStart"));
+const endStr = new Date().toLocaleDateString("en-NZ").replace(/\//g, "-");
+a.setAttribute("download", `${stationName}_${startStr}_${endStr}.csv`);
 a.click();
 }
 
@@ -538,7 +554,8 @@ function resetAllFarms() {
   baleCount = 0;
   sessionCount = 0;
   baleCountSet = false;
-  updateDisplays();
+ localStorage.removeItem("sessionStart");
+    updateDisplays();
 
   alert("All farm bale counts have been reset.");
 }
