@@ -281,7 +281,8 @@
     th, td { border: 1px solid #fff; padding: 5px; font-size: 14px; }
     #scanBox { margin: 10px auto; width: 320px; height: 240px; border: 2px solid #fff; position: relative; }
     #startScanBtn { position: absolute; bottom: 5px; left: 5px; z-index: 5; }
-  .new-day-button {
+  .new-day-button 
+    {
   font-size: 1rem;
   padding: 0.3rem 0.6rem;
   border-radius: 6px;
@@ -299,8 +300,13 @@
 <div class="scanner-header" style="text-align: center; margin-bottom: 1rem;">
   <h1 style="margin: 0; font-size: 1.8rem;">Bale Scanner</h1>
 </div>
-  <button class="new-day-button" onclick="location.reload()">New Day</button>
-
+  <button class="new-day-button" onclick="location.reload()">Start New Farm</button>
+ font-size: 1rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 6px;
+        background-color: #111;
+        color: #fff;
+        border: 1px solid #444
 <div style="position: absolute; top: 10px; right: 10px;">
 <button onclick="resetAllFarms()">Reset All</button>
 </div>
