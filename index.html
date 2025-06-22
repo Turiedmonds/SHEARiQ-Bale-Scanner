@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 
 <html lang="en">
@@ -319,7 +320,6 @@
 <button onclick="exportCSV()">End of Day</button>
 <button onclick="deleteLastEntry()">Delete Last Entry</button>
 
-
 <table id="logTable">
 <thead>
 <tr><th>#</th><th>Wool Type</th><th>Presser</th><th>Farm</th><th>Timestamp</th></tr>
@@ -489,7 +489,8 @@ function deleteLastEntry() {
   logTable.removeChild(lastRow);
   sessionCount = Math.max(0, sessionCount - 1);
   baleCount = Math.max(0, baleCount - 1);
- storeBaleCount(document.getElementById("station").value.trim(), baleCount);
+  storeBaleCount(document.getElementById("station").value.trim(), baleCount);
+  updateDisplays();
 
 }
 
