@@ -4,7 +4,6 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <title>
@@ -12,8 +11,6 @@
   <span style="display: inline-block; border: 2px solid #fff; padding: 0 6px; border-radius: 4px; font-weight: bold; font-style: italic; margin-left: 4px;">iQ</span>
   Bale Scanner
 </title>
-
-</script>
 <style>
     body {
         font-family: 'Arial', sans-serif;
@@ -343,7 +340,14 @@ let sessionCount = 0;
 let baleCountSet = false;
 let videoStream = null;
 let animationFrameId = null;
-
+function formatDate(date){
+  const day=String(date.getDate()).padStart(2,"0");
+  const month=String(date.getMonth()+1).padStart(2,"0");
+  const year=date.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+let csvRows=[];
+let csvSessionDate=formatDate(new Date());
 function getStoredBaleCount(farmName) {
   const key = "lastBale_" + farmName.toLowerCase();
   const stored = localStorage.getItem(key);
@@ -369,7 +373,8 @@ function setStartingBale() {
     baleCount = start;
     sessionCount = 0;
     baleCountSet = true;
-    updateDisplays();
+    csvSessionDate = formatDate(new Date());
+      updateDisplays();
   }
 }
 
@@ -386,6 +391,8 @@ function resetThisFarmSession() {
   baleCount = 0;
   sessionCount = 0;
   baleCountSet = false;
+     csvRows.push([]);
+  csvSessionDate = formatDate(new Date());
   updateDisplays();
 
   alert(`Reset complete for "${farmNameInput}". All bale data cleared for this farm.`);
@@ -405,7 +412,10 @@ function logBale(qrText) {
   row.insertCell(1).textContent = qrText;
   row.insertCell(2).textContent = document.getElementById("presser").value;
   row.insertCell(3).textContent = document.getElementById("station").value;
-  row.insertCell(4).textContent = new Date().toLocaleString();
+   const timestamp = new Date().toLocaleString();
+  row.insertCell(4).textContent = timestamp;
+  csvRows.push([baleCount, qrText, document.getElementById("presser").value,
+                document.getElementById("station").value, timestamp]);
   sessionCount++;
   storeBaleCount(document.getElementById("station").value.trim(), baleCount);
   baleCount++;
@@ -484,6 +494,7 @@ function deleteLastEntry() {
     }
   }
   logTable.removeChild(lastRow);
+   if (csvRows.length > 0) csvRows.pop();  
 sessionCount = Math.max(0, sessionCount - 1);
 baleCount = Math.max(0, baleCount - 1);
 const farmName = document.getElementById("station").value.trim();
@@ -491,34 +502,28 @@ storeBaleCount(farmName, baleCount > 0 ? baleCount - 1 : 0);
 updateDisplays();
 console.log("Saving to storage:", farmName, "with bale count:", baleCount);
 }
-function exportCSV()
-{const rows = [["#", "Wool Type", "Presser", "Farm", "Timestamp"]];
-const table = document.getElementById("logTable").querySelector("tbody");
-for (let row of table.rows) {
-  let cells = Array.from(row.cells).map(cell => cell.textContent);
-  rows.push(cells);
-}
-
-// Add Wool Type Totals
-rows.push([]);
-rows.push(["--- Wool Type Totals ---"]);
-rows.push(["Wool Type", "Total Bales"]);
-
-const totalsTable = document.getElementById("woolTypeTotals").querySelector("tbody");
-for (let row of totalsTable.rows) {
-  const woolType = row.cells[0].textContent;
-  const count = row.cells[1].textContent;
-  rows.push([woolType, count]);
-}
-
-// ✅ Now convert after everything has been added
+function exportCSV() {
+  const rows = [["#", "Wool Type", "Presser", "Farm", "Timestamp"], ...csvRows];
+ 
+    
+    // Add Wool Type Totals
+  rows.push([]);
+  rows.push(["--- Wool Type Totals ---"]);
+  rows.push(["Wool Type", "Total Bales"]);
+ const totalsTable = document.getElementById("woolTypeTotals").querySelector("tbody");
+  for (let row of totalsTable.rows) {
+    const woolType = row.cells[0].textContent;
+    const count = row.cells[1].textContent;
+    rows.push([woolType, count]);
+  }
 const csvContent = rows.map(e => e.join(",")).join("\n");
-const blob = new Blob([csvContent], { type: "text/csv" });
-const url = URL.createObjectURL(blob);
-const a = document.createElement("a");
-a.setAttribute("href", url);
-a.setAttribute("download", "bale_log.csv");
-a.click();
+  const blob = new Blob([csvContent], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const station = document.getElementById("station").value.trim() || "Station";
+  a.setAttribute("href", url);
+  a.setAttribute("download", `${station}_${csvSessionDate}.csv`);
+  a.click();
 }
 
 function resetAllFarms() {
@@ -535,6 +540,8 @@ function resetAllFarms() {
   baleCount = 0;
   sessionCount = 0;
   baleCountSet = false;
+    csvRows.push([]);
+  csvSessionDate = formatDate(new Date());
   updateDisplays();
 
   alert("All farm bale counts have been reset.");
