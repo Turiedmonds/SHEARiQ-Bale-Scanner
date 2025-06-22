@@ -484,13 +484,13 @@ function deleteLastEntry() {
     }
   }
   logTable.removeChild(lastRow);
-  sessionCount = Math.max(0, sessionCount - 1);
-  baleCount = Math.max(0, baleCount - 1);
-  storeBaleCount(document.getElementById("station").value.trim(), baleCount);
-  updateDisplays();
-  console.log("Saving to storage:", farmName, "with bale count:", baleCount);
+sessionCount = Math.max(0, sessionCount - 1);
+baleCount = Math.max(0, baleCount - 1);
+const farmName = document.getElementById("station").value.trim();
+storeBaleCount(farmName, baleCount > 0 ? baleCount - 1 : 0);
+updateDisplays();
+console.log("Saving to storage:", farmName, "with bale count:", baleCount);
 }
-
 function exportCSV()
 {const rows = [["#", "Wool Type", "Presser", "Farm", "Timestamp"]];
 const table = document.getElementById("logTable").querySelector("tbody");
