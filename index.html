@@ -499,6 +499,15 @@ function exportCSV() {
     let cells = Array.from(row.cells).map(cell => cell.textContent);
     rows.push(cells);
   }
+
+    const totalsTable = document.getElementById("woolTypeTotals").querySelector("tbody");
+  rows.push([]); // blank line between data sets
+  rows.push(["Wool Type", "Total Bales"]);
+  for (let row of totalsTable.rows) {
+    let cells = Array.from(row.cells).map(cell => cell.textContent);
+    rows.push(cells);
+  }
+    
   const csvContent = rows.map(e => e.join(",")).join("\n");
   const blob = new Blob([csvContent], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
