@@ -1,0 +1,73 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #000;
+    color: #fff;
+    margin: 0;
+    padding: 1rem;
+    text-align: center;
+}
+h1 {
+    font-size: 1.8rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+label {
+    display: block;
+    font-size: 1.1rem;
+    margin: 0.6rem 0 0.3rem 0;
+}
+input {
+    font-size: 1rem;
+    width: 90%;
+    max-width: 400px;
+    padding: 0.3rem;
+    margin-bottom: 0.8rem;
+    border-radius: 5px;
+    border: none;
+    height: 28px;
+    text-align: center;
+}
+button {
+    font-size: 1rem;
+    padding: 0.4rem 0.8rem;
+    margin: 0.3rem;
+    border-radius: 6px;
+    border: none;
+    background-color: #111;
+    color: #fff;
+}
+#scanBox {
+    margin: 1.2rem auto;
+    width: 95%;
+    max-width: 400px;
+    height: 240px;
+    border: 2px solid #fff;
+    border-radius: 10px;
+    position: relative;
+}
+#startScanBtn {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    z-index: 5;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+}
+th, td {
+    border: 1px solid #fff;
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+.new-day-button {
+    font-size: 1rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    background-color: #111;
+    color: #fff;
+    border: 1px solid #444;
+    margin-left: 1rem;
+}
