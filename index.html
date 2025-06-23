@@ -492,6 +492,10 @@ const farmName = document.getElementById("station").value.trim();
 
 }
 
+   function escapeCSV(str) {
+  return '"' + String(str).replace(/"/g, '""') + '"';
+}
+    
 function exportCSV() {
   const rows = [["#", "Wool Type", "Presser", "Farm", "Timestamp"]];
   const table = document.getElementById("logTable").querySelector("tbody");
@@ -508,7 +512,9 @@ function exportCSV() {
     rows.push(cells);
   }
     
-  const csvContent = rows.map(e => e.join(",")).join("\n");
+   const csvContent = rows
+    .map(row => row.map(escapeCSV).join(','))
+    .join('\n');
   const blob = new Blob([csvContent], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
