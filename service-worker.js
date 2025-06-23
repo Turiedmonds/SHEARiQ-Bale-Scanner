@@ -4,7 +4,6 @@ const urlsToCache = [
   './index.html',
   './manifest.json',
   './icon-192.png',
-  './jsqr.js',
 ];
 
 self.addEventListener('install', event => {
