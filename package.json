@@ -1,7 +1,0 @@
-{
-  "name": "sheariq-pwa",
-  "version": "1.0.0",
-  "scripts": {
-    "test": "node tests/service-worker.test.js"
-  }
-}
