@@ -467,7 +467,7 @@ function stopQRScan() {
 }
 
 function deleteLastEntry() {
-
+const farmName = document.getElementById("station").value.trim();
   const logTable = document.getElementById("logTable").querySelector("tbody");
   const lastRow = logTable.rows[logTable.rows.length - 1];
   const woolType = lastRow.cells[1].textContent.trim();
