@@ -516,16 +516,20 @@ function exportCSV() {
     rows.push(cells);
   }
     
-   const csvContent = rows
-    .map(row => row.map(escapeCSV).join(','))
-    .join('\n');
-  const blob = new Blob([csvContent], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.setAttribute("href", url);
-  a.setAttribute("download", "bale_log.csv");
-  a.click();
-}
+    const csvContent = rows
+      .map(row => row.map(escapeCSV).join(','))
+      .join('\n');
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.setAttribute("href", url);
+    const farmName = document.getElementById("station").value.trim() || "farm";
+    const now = new Date();
+    const dateStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
+    const fileName = `${farmName.replace(/\s+/g, '_')}_${dateStr}.csv`;
+    a.setAttribute("download", fileName);
+    a.click();
+  }
 
 function resetAllFarms() {
   const keysToRemove = [];
