@@ -395,8 +395,10 @@ function resetThisFarmSession() {
   baleCount = 0;
   sessionCount = 0;
   baleCountSet = false;
-     csvRows.push([]);
-  csvSessionDate = formatDate(new Date());
+    csvRows = [];
+  document.getElementById('logTable').querySelector('tbody').innerHTML = '';
+  document.getElementById('woolTypeTotals').querySelector('tbody').innerHTML = '';
+  csvSessionDate = formatDate(new Date()); 
   updateDisplays();
 
   alert(`Reset complete for "${farmNameInput}". All bale data cleared for this farm.`);
@@ -510,27 +512,41 @@ console.log("Saving to storage:", farmName, "with bale count:", baleCount);
 storeCsvData();
 }
 function exportCSV() {
-  const rows = [["#", "Wool Type", "Presser", "Farm", "Timestamp"], ...csvRows];
- 
-    
-    // Add Wool Type Totals
-  rows.push([]);
-  rows.push(["--- Wool Type Totals ---"]);
-  rows.push(["Wool Type", "Total Bales"]);
- const totalsTable = document.getElementById("woolTypeTotals").querySelector("tbody");
+  const station = document.getElementById("station").value.trim() || "Station";
+  const fileKey = `csvFile_${station}_${csvSessionDate}`;
+  let stored = JSON.parse(localStorage.getItem(fileKey) || "[]");
+
+  if (stored.length) {
+    stored.push([]); // spacer between sessions
+  }
+
+  let sessionRows = [["#", "Wool Type", "Presser", "Farm", "Timestamp"], ...csvRows];
+
+  // Add Wool Type Totals
+  sessionRows.push([]);
+  sessionRows.push(["--- Wool Type Totals ---"]);
+  sessionRows.push(["Wool Type", "Total Bales"]);
+  const totalsTable = document.getElementById("woolTypeTotals").querySelector("tbody");
   for (let row of totalsTable.rows) {
     const woolType = row.cells[0].textContent;
     const count = row.cells[1].textContent;
-    rows.push([woolType, count]);
+   sessionRows.push([woolType, count]);
   }
-const csvContent = rows.map(e => e.join(",")).join("\n");
+
+  stored = stored.concat(sessionRows);
+  localStorage.setItem(fileKey, JSON.stringify(stored));
+
+  const csvContent = stored.map(e => e.join(",")).join("\n");
   const blob = new Blob([csvContent], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  const station = document.getElementById("station").value.trim() || "Station";
   a.setAttribute("href", url);
   a.setAttribute("download", `${station}_${csvSessionDate}.csv`);
   a.click();
+  URL.revokeObjectURL(url);
+  csvRows = [];
+  document.getElementById('logTable').querySelector('tbody').innerHTML = '';
+  storeCsvData();
 }
 
 function resetAllFarms() {
@@ -547,7 +563,9 @@ function resetAllFarms() {
   baleCount = 0;
   sessionCount = 0;
   baleCountSet = false;
-    csvRows.push([]);
+  csvRows = [];
+  document.getElementById('logTable').querySelector('tbody').innerHTML = '';
+  document.getElementById('woolTypeTotals').querySelector('tbody').innerHTML = '';
   csvSessionDate = formatDate(new Date());
   updateDisplays();
 
