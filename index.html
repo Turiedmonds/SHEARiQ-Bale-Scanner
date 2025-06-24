@@ -464,6 +464,8 @@ function updateDisplays() {
   cell.colSpan = 5;
   cell.innerHTML = "&nbsp;";
   storeFarmData(document.getElementById("station").value.trim());
+      // Reload the page so counters reset like before
+  location.reload();  
 }
 
 function logBale(qrText) {
