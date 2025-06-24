@@ -278,16 +278,23 @@
     th, td { border: 1px solid #fff; padding: 5px; font-size: 14px; }
     #scanBox { margin: 10px auto 40px; width: 320px; height: 240px; border: 2px solid #fff; position: relative; }
     #startScanBtn { position: absolute; bottom: 5px; left: 5px; z-index: 5; }
-  .new-day-button 
-    {
-  font-size: 1rem;
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
-  background-color: #222;
-  color: #fff;
-  border: 1px solid #444;
-  margin-left: 1rem;
-}
+  # New day button styling
+  .new-day-button {
+    font-size: 1rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    background-color: #222;
+    color: #fff;
+    border: 1px solid #444;
+    margin-left: 1rem;
+  }
+
+  /* Blank row between days */
+  .day-separator td {
+    border: none;
+    padding: 0;
+    height: 10px;
+  }
 #logTable th,
 #logTable td {
  text-align: center;
@@ -301,7 +308,7 @@
 <div class="scanner-header" style="text-align: center; margin-bottom: 1rem;">
   <h1 style="margin: 0; font-size: 1.8rem;">Bale Scanner</h1>
 </div>
-  <button class="new-day-button" onclick="location.reload()">New Farm/Day</button>
+ <button class="new-day-button" onclick="newStartDay()">New Farm/Day</button>
 <div style="position: absolute; top: 10px; right: 10px;">
 <button onclick="resetAllFarms()">Reset All</button>
 </div>
@@ -449,6 +456,16 @@ function updateDisplays() {
   document.getElementById("todayCountDisplay").textContent = "Today's Bale Count: " + sessionCount;
 }
 
+    function newStartDay() {
+  const logBody = document.getElementById("logTable").querySelector("tbody");
+  const row = logBody.insertRow();
+  row.classList.add("day-separator");
+  const cell = row.insertCell(0);
+  cell.colSpan = 5;
+  cell.innerHTML = "&nbsp;";
+  storeFarmData(document.getElementById("station").value.trim());
+}
+
 function logBale(qrText) {
   playFeedback();
   const table = document.getElementById("logTable").querySelector("tbody");
@@ -522,6 +539,12 @@ function deleteLastEntry() {
 const farmName = document.getElementById("station").value.trim();
   const logTable = document.getElementById("logTable").querySelector("tbody");
   const lastRow = logTable.rows[logTable.rows.length - 1];
+    if (!lastRow) return;
+  if (lastRow.classList.contains("day-separator")) {
+    logTable.removeChild(lastRow);
+    storeFarmData(farmName);
+    return;
+  }
   const woolType = lastRow.cells[1].textContent.trim();
   const totalsTable = document.getElementById("woolTypeTotals").querySelector("tbody");
   for (let i = 0; i < totalsTable.rows.length; i++) {
