@@ -307,10 +307,11 @@
 <div style="text-align: right; margin: 0 1rem -0.5rem 0;">
 </div>
 <div class="scanner-header" style="text-align: center; margin-bottom: 1rem;">
-  <h1 style="margin: 0; font-size: 1.8rem;">Bale Scanner</h1>
-</div>
- <button class="new-day-button" onclick="newStartDay()">New Farm/Day</button>
-<div style="position: absolute; top: 10px; right: 10px;">
+    <h1 style="margin: 0; font-size: 1.8rem;">Bale Scanner</h1>
+  </div>
+  <button onclick="signIn()">Sign in with Google</button>
+  <button class="new-day-button" onclick="newStartDay()">New Farm/Day</button>
+  <div style="position: absolute; top: 10px; right: 10px;">
 <button onclick="resetAllFarms()">Reset All</button>
 </div>
 <label>Farm/Station Name: <input id="station" type="text" onchange="loadFarmData()"/></label><br/>
