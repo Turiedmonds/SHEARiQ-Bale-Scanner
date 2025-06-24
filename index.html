@@ -617,7 +617,7 @@ function exportCSV() {
   }
 
 function resetAllFarms() {
-    if (!confirm("This will clear all farm data. Save sessions by tapping the End of Day button first. Continue?")) {
+    alert(!confirm("This will clear all farm data. Save sessions by tapping the End of Day button first. Continue?")) {
     return;
   }
   const keysToRemove = [];
