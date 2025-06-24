@@ -431,7 +431,7 @@ function setStartingBale() {
 }
 
 function resetThisFarmSession() {
-     alert(!confirm("This will clear all data for this farm. Save the session by tapping the End of Day button first. Continue?")) {
+     if (!confirm("This will clear all data for this farm. Save the session by tapping the End of Day button first. Continue?")) {
     return;
   }
   const farmNameInput = document.getElementById("station").value.trim();
@@ -617,7 +617,7 @@ function exportCSV() {
   }
 
 function resetAllFarms() {
-    alert(!confirm("This will clear all farm data. Save sessions by tapping the End of Day button first. Continue?")) {
+  if (!confirm("This will clear all farm data. Save sessions by tapping the End of Day button first. Continue?")) {  
     return;
   }
   const keysToRemove = [];
@@ -630,6 +630,12 @@ function resetAllFarms() {
 
   keysToRemove.forEach(key => localStorage.removeItem(key));
 
+const logBody = document.getElementById("logTable").querySelector("tbody");
+  const totalsBody = document.getElementById("woolTypeTotals").querySelector("tbody");
+  logBody.innerHTML = '';
+  totalsBody.innerHTML = '';
+  document.getElementById("startBale").value = 1;
+    
   baleCount = 0;
   sessionCount = 0;
   baleCountSet = false;
