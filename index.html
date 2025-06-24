@@ -348,6 +348,21 @@ let baleCountSet = false;
 let videoStream = null;
 let animationFrameId = null;
 
+function getFarmKey(farmName) {
+  return "csvData_" + farmName.toLowerCase();
+}
+
+function getStoredRows(farmName) {
+  const key = getFarmKey(farmName);
+  const stored = localStorage.getItem(key);
+  return stored ? JSON.parse(stored) : [];
+}
+
+function storeRows(farmName, rows) {
+  const key = getFarmKey(farmName);
+  localStorage.setItem(key, JSON.stringify(rows));
+}
+    
 function getStoredBaleCount(farmName) {
   const key = "lastBale_" + farmName.toLowerCase();
   const stored = localStorage.getItem(key);
@@ -410,7 +425,19 @@ function logBale(qrText) {
   row.insertCell(2).textContent = document.getElementById("presser").value;
   row.insertCell(3).textContent = document.getElementById("station").value;
   row.insertCell(4).textContent = new Date().toLocaleString();
-  sessionCount++;
+ 
+   const farm = document.getElementById("station").value.trim();
+  const storedRows = getStoredRows(farm);
+  storedRows.push([
+    baleCount,
+    qrText,
+    document.getElementById("presser").value,
+    farm,
+    new Date().toLocaleString()
+  ]);
+  storeRows(farm, storedRows);
+ 
+    sessionCount++;
   storeBaleCount(document.getElementById("station").value.trim(), baleCount);
   baleCount++;
   updateDisplays();
@@ -500,12 +527,16 @@ const farmName = document.getElementById("station").value.trim();
 }
     
 function exportCSV() {
-  const rows = [["#", "Wool Type", "Presser", "Farm", "Timestamp"]];
+  const farmName = document.getElementById("station").value.trim() || "farm";
+  const storedRows = getStoredRows(farmName);
   const table = document.getElementById("logTable").querySelector("tbody");
   for (let row of table.rows) {
     let cells = Array.from(row.cells).map(cell => cell.textContent);
-    rows.push(cells);
+   storedRows.push(cells);
   }
+  storeRows(farmName, storedRows);
+
+  const rows = [["#", "Wool Type", "Presser", "Farm", "Timestamp"], ...storedRows];
 
     const totalsTable = document.getElementById("woolTypeTotals").querySelector("tbody");
   rows.push([]); // blank line between data sets
@@ -522,7 +553,6 @@ function exportCSV() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.setAttribute("href", url);
-    const farmName = document.getElementById("station").value.trim() || "farm";
     const now = new Date();
     const dateStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
     const fileName = `${farmName.replace(/\s+/g, '_')}_${dateStr}.csv`;
