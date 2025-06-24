@@ -326,6 +326,7 @@
 </div>
 
 <button onclick="exportCSV()">End of Day</button>
+    <span id="pendingUploadsCounter" style="margin-left: 10px;">Pending Uploads: 0</span>
 <button onclick="deleteLastEntry()">Delete Last Entry</button>
 
 <h2 style="margin-top: 30px;">Bale Log</h2>
@@ -396,17 +397,27 @@ function uploadFileToGoogleDrive(fileContent, fileName) {
     }).then(response => response.json())
     .then(result => {
         console.log('File uploaded successfully. File ID: ' + result.id);
+    alert('File uploaded successfully to Google Drive.');
     }).catch(error => {
         console.error('Error uploading file: ', error);
+        alert('Upload failed. File saved locally for later upload.');
+        savePendingUpload(fileContent, fileName);
     });
 }
 
 const PENDING_UPLOADS_KEY = 'pendingUploads';
 
+function updatePendingUploadsCounter() {
+    const count = JSON.parse(localStorage.getItem(PENDING_UPLOADS_KEY) || '[]').length;
+    const el = document.getElementById('pendingUploadsCounter');
+    if (el) el.textContent = 'Pending Uploads: ' + count;
+}
+ 
 function savePendingUpload(content, name) {
     const pending = JSON.parse(localStorage.getItem(PENDING_UPLOADS_KEY) || '[]');
     pending.push({ fileName: name, fileContent: content });
     localStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(pending));
+updatePendingUploadsCounter();
 }
 
 function uploadPendingUploads() {
@@ -433,6 +444,7 @@ function uploadPendingUploads() {
         } else {
             localStorage.removeItem(PENDING_UPLOADS_KEY);
         }
+        updatePendingUploadsCounter();
     });
 }
 
@@ -798,7 +810,8 @@ function updateWoolTypeTotals(woolType) {
   window.addEventListener('load', () => {
     handleClientLoad();
     uploadPendingUploads();
+      updatePendingUploadsCounter();
   });
-</script> 
+</script>
 </body>
 </html>
