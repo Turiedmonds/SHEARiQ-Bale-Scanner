@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sheariq-cache-v1';
+const CACHE_NAME = 'sheariq-cache-v2';
 const urlsToCache = [
   './',
   './index.html',
