@@ -7,7 +7,7 @@
     <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-<script src="https://apis.google.com/js/api.js" onerror="alert('Google API failed to load. Please check your internet connection or try another browser.')"></script>
+<script src="https://apis.google.com/js/api.js" onload="console.log('Google API script loaded.');" onerror="alert('Google API failed to load. Please check your internet connection or try another browser.')"></script>
 <title>
   <span style="font-style: italic;">SHEΔR</span>
   <span style="display: inline-block; border: 2px solid #fff; padding: 0 6px; border-radius: 4px; font-weight: bold; font-style: italic; margin-left: 4px;">iQ</span>
@@ -356,6 +356,7 @@
 const SCOPE = 'https://www.googleapis.com/auth/drive.file';
 
 function initClient() {
+   console.log('initClient function called.');
     gapi.client.init({
         apiKey: '', // Optional, can leave blank
         clientId: '220936743738-4gjocsgd6a7ihmailiqh7noigejt46bl.apps.googleusercontent.com',
@@ -363,10 +364,12 @@ function initClient() {
         discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
     }).then(function () {
         GoogleAuth = gapi.auth2.getAuthInstance();
+        console.log('Google API client initialized.');
         if (GoogleAuth.isSignedIn.get()) {
             console.log('Already signed in');
         }
         document.getElementById("signInButton").disabled = false;
+        console.log('Sign-in button enabled.');
     });
 }
 
