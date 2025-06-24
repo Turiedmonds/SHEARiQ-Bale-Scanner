@@ -372,7 +372,7 @@ function handleClientLoad() {
 }
 
 function signIn() {
-    GoogleAuth.signIn().then(function() {
+   return GoogleAuth.signIn().then(function() { 
         console.log('Signed in successfully');
     });
 }
@@ -400,6 +400,43 @@ function uploadFileToGoogleDrive(fileContent, fileName) {
         console.error('Error uploading file: ', error);
     });
 }
+
+const PENDING_UPLOADS_KEY = 'pendingUploads';
+
+function savePendingUpload(content, name) {
+    const pending = JSON.parse(localStorage.getItem(PENDING_UPLOADS_KEY) || '[]');
+    pending.push({ fileName: name, fileContent: content });
+    localStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(pending));
+}
+
+function uploadPendingUploads() {
+    if (!navigator.onLine) return;
+    const pending = JSON.parse(localStorage.getItem(PENDING_UPLOADS_KEY) || '[]');
+    if (!pending.length) return;
+
+    const ensureSignIn = GoogleAuth && GoogleAuth.isSignedIn.get()
+        ? Promise.resolve()
+        : signIn();
+
+    ensureSignIn.then(() => {
+        const remaining = [];
+        pending.forEach(item => {
+            try {
+                uploadFileToGoogleDrive(item.fileContent, item.fileName);
+            } catch (e) {
+                console.error('Upload failed for', item.fileName, e);
+                remaining.push(item);
+            }
+        });
+        if (remaining.length) {
+            localStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(remaining));
+        } else {
+            localStorage.removeItem(PENDING_UPLOADS_KEY);
+        }
+    });
+}
+
+window.addEventListener('online', uploadPendingUploads);
     
 let baleCount = 0;
 let sessionCount = 0;
@@ -666,7 +703,18 @@ function exportCSV() {
     const fileName = `${farmName.replace(/\s+/g, '_')}_${dateStr}.csv`;
     a.setAttribute("download", fileName);
     a.click();
-    uploadFileToGoogleDrive(csvContent, fileName);
+    
+    if (!navigator.onLine) {
+      savePendingUpload(csvContent, fileName);
+      return;
+    }
+
+    if (GoogleAuth && GoogleAuth.isSignedIn.get()) {
+      uploadFileToGoogleDrive(csvContent, fileName);
+    } else {
+      signIn().then(() => uploadFileToGoogleDrive(csvContent, fileName))
+             .catch(() => savePendingUpload(csvContent, fileName));
+    }
   }
 
 function resetAllFarms() {
@@ -747,7 +795,10 @@ function updateWoolTypeTotals(woolType) {
   }
 </script>
    <script>
-  window.addEventListener('load', handleClientLoad);
+  window.addEventListener('load', () => {
+    handleClientLoad();
+    uploadPendingUploads();
+  });
 </script> 
 </body>
 </html>
