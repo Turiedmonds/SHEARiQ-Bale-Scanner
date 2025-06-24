@@ -438,10 +438,18 @@ function resetThisFarmSession() {
   }
 
   const key = "lastBale_" + farmNameInput.toLowerCase();
-    localStorage.removeItem(key);
-    localStorage.removeItem(getFarmKey('logData', farmNameInput));
-    localStorage.removeItem(getFarmKey('totals', farmNameInput));
+   localStorage.removeItem(key);
+  localStorage.removeItem(getFarmKey('logData', farmNameInput));
+  localStorage.removeItem(getFarmKey('totals', farmNameInput));
 
+  const logBody = document.getElementById("logTable").querySelector("tbody");
+  const totalsBody = document
+    .getElementById("woolTypeTotals")
+    .querySelector("tbody");
+  logBody.innerHTML = '';
+  totalsBody.innerHTML = '';
+  document.getElementById("startBale").value = 1;
+    
   baleCount = 0;
   sessionCount = 0;
   baleCountSet = false;
