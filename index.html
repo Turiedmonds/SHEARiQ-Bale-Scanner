@@ -431,7 +431,7 @@ function setStartingBale() {
 }
 
 function resetThisFarmSession() {
-     if (!confirm("This will clear all data for this farm. Save the session by tapping the End of Day button first. Continue?")) {
+     alert(!confirm("This will clear all data for this farm. Save the session by tapping the End of Day button first. Continue?")) {
     return;
   }
   const farmNameInput = document.getElementById("station").value.trim();
