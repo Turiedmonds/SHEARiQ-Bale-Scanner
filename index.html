@@ -362,17 +362,6 @@ function storeRows(farmName, rows) {
   const key = getFarmKey(farmName);
   localStorage.setItem(key, JSON.stringify(rows));
 }
-    
-function getStoredBaleCount(farmName) {
-  const key = "lastBale_" + farmName.toLowerCase();
-  const stored = localStorage.getItem(key);
-  return stored ? parseInt(stored) + 1 : null;
-}
-
-function storeBaleCount(farmName, count) {
-  const key = "lastBale_" + farmName.toLowerCase();
-  localStorage.setItem(key, count);
-}
 
 function setStartingBale() {
   const farmName = document.getElementById("station").value.trim();
@@ -426,7 +415,7 @@ function logBale(qrText) {
   row.insertCell(3).textContent = document.getElementById("station").value;
   row.insertCell(4).textContent = new Date().toLocaleString();
  
-   const farm = document.getElementById("station").value.trim();
+    const farm = document.getElementById("station").value.trim();
   const storedRows = getStoredRows(farm);
   storedRows.push([
     baleCount,
@@ -500,6 +489,9 @@ function deleteLastEntry() {
 const farmName = document.getElementById("station").value.trim();
   const logTable = document.getElementById("logTable").querySelector("tbody");
   const lastRow = logTable.rows[logTable.rows.length - 1];
+     if (logTable.rows.length === 0) {
+    return;
+  }
   const woolType = lastRow.cells[1].textContent.trim();
   const totalsTable = document.getElementById("woolTypeTotals").querySelector("tbody");
   for (let i = 0; i < totalsTable.rows.length; i++) {
@@ -515,6 +507,11 @@ const farmName = document.getElementById("station").value.trim();
     }
   }
   logTable.removeChild(lastRow);
+    const storedRows = getStoredRows(farmName);
+  if (storedRows.length > 0) {
+    storedRows.pop();
+    storeRows(farmName, storedRows);
+  }
   sessionCount = Math.max(0, sessionCount - 1);
   baleCount = Math.max(0, baleCount - 1);
   storeBaleCount(farmName, baleCount > 0 ? baleCount - 1 : 0);
