@@ -1,1 +1,19 @@
 config.js
+
+# Dependencies
+node_modules/
+
+# Build artifacts
+build/
+dist/
+
+# Logs
+*.log
+
+# Personal configuration
+config.js
+.env*
+
+# OS metadata
+.DS_Store
+README.md
