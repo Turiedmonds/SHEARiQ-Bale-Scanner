@@ -479,6 +479,84 @@ function updateWoolTypeTotals(woolType) {
     }
 }
 
+// Recalculate wool type totals based on the entire log table
+function rebuildWoolTypeTotals() {
+    const totalsBody = document.getElementById("woolTypeTotals").querySelector("tbody");
+    totalsBody.innerHTML = '';
+    const counts = {};
+    const logRows = document.getElementById("logTable").querySelector("tbody").rows;
+    for (let row of logRows) {
+        if (row.classList.contains('day-separator')) continue;
+        const type = row.cells[1].textContent.trim();
+        if (type) counts[type] = (counts[type] || 0) + 1;
+    }
+    Object.keys(counts).forEach(type => {
+        const r = totalsBody.insertRow();
+        r.insertCell(0).textContent = type;
+        r.insertCell(1).textContent = counts[type];
+    });
+}
+
+// Update bale counters and today's count based on table rows
+function recalcBaleCounts() {
+    const logRows = document.getElementById("logTable").querySelector("tbody").rows;
+    sessionCount = 0;
+    let maxNum = 0;
+    for (let row of logRows) {
+        if (row.classList.contains('day-separator')) continue;
+        sessionCount++;
+        const num = parseInt(row.cells[0].textContent);
+        if (!isNaN(num) && num > maxNum) maxNum = num;
+    }
+    baleCount = maxNum + 1;
+    baleCountSet = true;
+    storeBaleCount(document.getElementById("station").value.trim(), maxNum);
+    updateDisplays();
+}
+
+let editMode = false;
+let allowBaleEdit = false;
+
+// Toggle entire table between editable inputs and plain text
+function toggleEditTable() {
+    const body = document.getElementById('logTable').querySelector('tbody');
+    const button = document.getElementById('editTableButton');
+    if (!editMode) {
+        allowBaleEdit = confirm('Edit bale numbers as well?');
+        for (let row of body.rows) {
+            if (row.classList.contains('day-separator')) continue;
+            for (let i = 0; i < row.cells.length; i++) {
+                if (i === 0 && !allowBaleEdit) continue;
+                const cell = row.cells[i];
+                const input = document.createElement('input');
+                input.value = cell.textContent;
+                if (i === 0) input.type = 'number';
+                cell.textContent = '';
+                cell.appendChild(input);
+            }
+        }
+        button.textContent = 'Save Table';
+    } else {
+        for (let row of body.rows) {
+            if (row.classList.contains('day-separator')) continue;
+            for (let i = 0; i < row.cells.length; i++) {
+                if (i === 0 && !allowBaleEdit) continue;
+                const input = row.cells[i].querySelector('input');
+                if (input) {
+                    row.cells[i].textContent = input.value.trim();
+                }
+            }
+        }
+        allowBaleEdit = false;
+        rebuildWoolTypeTotals();
+        recalcBaleCounts();
+        storeFarmData(document.getElementById("station").value.trim());
+        button.textContent = 'Edit Table';
+    }
+    editMode = !editMode;
+}
+
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('service-worker.js')
@@ -505,4 +583,5 @@ window.addEventListener('load', () => {
     document.getElementById('startScanBtn').addEventListener('click', startQRScan);
     document.getElementById('exportButton').addEventListener('click', exportCSV);
     document.getElementById('deleteLastButton').addEventListener('click', deleteLastEntry);
+document.getElementById('editTableButton').addEventListener('click', toggleEditTable);
 });
