@@ -122,8 +122,7 @@ th, td {
 /* Larger font for bale counters */
 #currentBaleDisplay,
 #lastBaleNumberDisplay,
-#todayCountDisplay, 
-#pendingUploadsCounter, {
-    font-size: 0.6rem;
+#todayCountDisplay, {
+    font-size: 0.8rem;
     font-weight: bold;
 }
