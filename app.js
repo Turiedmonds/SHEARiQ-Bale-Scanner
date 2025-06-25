@@ -114,6 +114,7 @@ let animationFrameId = null;
 function insertDaySeparatorRow(body) {
     const row = body.insertRow();
     row.classList.add("day-separator");
+    row.setAttribute("data-separator-date", new Date().toDateString());
 
     const cell = row.insertCell(0);
     cell.colSpan = 5;
@@ -125,13 +126,18 @@ function checkForNewDay(farmName, logBody) {
     const dateKey = getFarmKey('lastScanDate', farmName);
     const today = new Date().toDateString();
     const lastDate = localStorage.getItem(dateKey);
+const separatorExists = Array.from(logBody.querySelectorAll('tr.day-separator'))
+        .some(row => row.getAttribute('data-separator-date') === today);
 
-    if (lastDate && lastDate !== today) {
+    if (lastDate && lastDate !== today && !separatorExists) {
         insertDaySeparatorRow(logBody);
-        localStorage.setItem(dateKey, today);
         storeFarmData(farmName);
-    } else if (!lastDate) {
+        }
+
+    if (lastDate !== today) {
         localStorage.setItem(dateKey, today);
+    } else if (!lastDate) {
+        localStorage.setItem(dateKey, today); 
     }
 }
 
