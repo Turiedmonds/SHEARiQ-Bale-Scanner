@@ -336,7 +336,7 @@ function startQRScan() {
     .then(function(stream) {
       videoStream = stream;
       video.srcObject = stream;
-      requestAnimationFrame(tick);
+      animationFrameId = requestAnimationFrame(tick);
     })
     .catch(function(err) {
       alert("Camera error: " + err.message);
