@@ -1,3 +1,4 @@
+# Local configuration
 config.js
 
 # Dependencies
@@ -11,7 +12,7 @@ dist/
 *.log
 
 # Personal configuration
-config.js
+
 .env*
 
 # OS metadata
