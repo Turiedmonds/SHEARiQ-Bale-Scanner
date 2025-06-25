@@ -343,6 +343,12 @@ function stopQRScan() {
     btn.textContent = 'Start QR Scan';
     btn.addEventListener('click', startQRScan);
     scanBox.appendChild(btn);
+
+     const manualBtn = document.createElement('button');
+    manualBtn.id = 'manualEntryButton';
+    manualBtn.textContent = 'Manual Entry';
+    manualBtn.addEventListener('click', manualEntry);
+    scanBox.appendChild(manualBtn);
 }
 
 function manualEntry() {
