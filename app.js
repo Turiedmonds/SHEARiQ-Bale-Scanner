@@ -345,6 +345,21 @@ function stopQRScan() {
     scanBox.appendChild(btn);
 }
 
+function manualEntry() {
+    if (!baleCountSet) {
+        alert('Please set a starting bale number first.');
+        return;
+    }
+    const woolType = prompt('Enter wool type:');
+    if (woolType === null) return;
+    const trimmed = woolType.trim();
+    if (!trimmed) {
+        alert('Wool type cannot be empty.');
+        return;
+    }
+    logBale(trimmed);
+}
+
 function deleteLastEntry() {
     const farmName = document.getElementById("station").value.trim();
     const logTable = document.getElementById("logTable").querySelector("tbody");
@@ -580,6 +595,7 @@ window.addEventListener('load', () => {
     document.getElementById('setStartButton').addEventListener('click', setStartingBale);
     document.getElementById('resetFarmButton').addEventListener('click', resetThisFarmSession);
     document.getElementById('startScanBtn').addEventListener('click', startQRScan);
+    document.getElementById('manualEntryButton').addEventListener('click', manualEntry);
     document.getElementById('exportButton').addEventListener('click', exportCSV);
     document.getElementById('deleteLastButton').addEventListener('click', deleteLastEntry);
 document.getElementById('editTableButton').addEventListener('click', toggleEditTable);
