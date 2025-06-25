@@ -21,3 +21,7 @@ Then open `http://localhost:8080` in your browser.
 ## Build/Deployment
 
 There is no build step. Simply deploy all files in this repository to any static hosting provider or web server. Ensure the site is served over HTTPS to allow installation as a PWA.
+
+## Export and Share
+
+Tap **End of Day** to export the current bale log as a CSV file. After the file is generated it will trigger your device's share options if available (via the Web Share API) so you can email or text the CSV directly. When sharing isn't supported a new email draft will open referencing the saved file.
