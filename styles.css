@@ -118,11 +118,3 @@ th, td {
 #logTable td {
     text-align: center;
 }
-
-/* Larger font for bale counters */
-#currentBaleDisplay,
-#lastBaleNumberDisplay,
-#todayCountDisplay, {
-    font-size: 1.6rem;
-    font-weight: bold;
-}
