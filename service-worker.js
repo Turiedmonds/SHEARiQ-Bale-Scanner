@@ -1,11 +1,12 @@
-const CACHE_NAME = 'sheariq-cache-v3';
+const CACHE_NAME = 'sheariq-cache-v4';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
  './styles.css',
-  './config.js', 
+  './config.js',
   './icon-192.png',
+  './app.js',
 ];
 
 self.addEventListener('install', event => {
