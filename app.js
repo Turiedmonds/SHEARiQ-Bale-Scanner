@@ -441,6 +441,21 @@ function exportCSV() {
         signIn().then(() => uploadFileToGoogleDrive(csvContent, fileName))
                .catch(() => savePendingUpload(csvContent, fileName));
     }
+  shareCSV(csvContent, fileName);
+}
+
+function shareCSV(csvContent, fileName) {
+    const file = new File([csvContent], fileName, { type: 'text/csv' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({
+            files: [file],
+            title: 'Bale Log',
+            text: 'End of day bale log attached.'
+        }).catch(err => console.error('Share failed:', err));
+    } else {
+        const mailBody = encodeURIComponent('Please see the attached bale log: ' + fileName);
+        window.location.href = 'mailto:?subject=' + encodeURIComponent('Bale Log') + '&body=' + mailBody;
+    }   
 }
 
 function resetAllFarms() {
