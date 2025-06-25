@@ -107,6 +107,13 @@ th, td {
     z-index: 5;
 }
 
+#manualEntryButton {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    z-index: 5;
+}
+
 #logTable th,
 #logTable td {
     text-align: center;
