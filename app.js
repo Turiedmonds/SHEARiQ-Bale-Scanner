@@ -267,6 +267,8 @@ function newStartDay() {
 function logBale(qrText) {
     playFeedback();
     const table = document.getElementById("logTable").querySelector("tbody");
+    const noteInput = document.getElementById("note");
+    const note = noteInput ? noteInput.value.trim() : "";
     const row = table.insertRow();
     row.insertCell(0).textContent = baleCount;
     row.insertCell(1).textContent = qrText;
@@ -274,6 +276,7 @@ function logBale(qrText) {
     row.insertCell(3).textContent = document.getElementById("station").value;
     row.insertCell(4).textContent = new Date().toLocaleString();
     row.insertCell(5).textContent = note;
+    if (noteInput) noteInput.value = "";
     sessionCount++;
     storeBaleCount(document.getElementById("station").value.trim(), baleCount);
     baleCount++;
