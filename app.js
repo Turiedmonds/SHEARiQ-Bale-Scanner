@@ -110,6 +110,31 @@ let baleCountSet = false;
 let videoStream = null;
 let animationFrameId = null;
 
+// Function to insert a new day separator row
+function insertDaySeparatorRow(body) {
+    const row = body.insertRow();
+    row.classList.add("day-separator");
+
+    const cell = row.insertCell(0);
+    cell.colSpan = 5;
+    cell.innerHTML = "&nbsp;";
+}
+
+// Function to check if it's a new day and insert separator if needed
+function checkForNewDay(farmName, logBody) {
+    const dateKey = getFarmKey('lastScanDate', farmName);
+    const today = new Date().toDateString();
+    const lastDate = localStorage.getItem(dateKey);
+
+    if (lastDate && lastDate !== today) {
+        insertDaySeparatorRow(logBody);
+        localStorage.setItem(dateKey, today);
+        storeFarmData(farmName);
+    } else if (!lastDate) {
+        localStorage.setItem(dateKey, today);
+    }
+}
+
 function getFarmKey(prefix, farmName) {
     return prefix + '_' + farmName.toLowerCase();
 }
