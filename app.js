@@ -255,6 +255,7 @@ function newStartDay() {
     const logBody = document.getElementById("logTable").querySelector("tbody");
     const row = logBody.insertRow();
     row.classList.add("day-separator");
+    row.setAttribute('data-separator-date', new Date().toDateString());
     const cell = row.insertCell(0);
     cell.colSpan = 5;
     cell.innerHTML = "&nbsp;";
