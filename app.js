@@ -117,7 +117,7 @@ function insertDaySeparatorRow(body) {
     row.setAttribute("data-separator-date", new Date().toDateString());
 
     const cell = row.insertCell(0);
-     cell.colSpan = 6;
+    cell.colSpan = 5;
     cell.innerHTML = "&nbsp;";
 }
 
@@ -166,7 +166,6 @@ function loadFarmData() {
     storedLogs.forEach(rowData => {
         const row = logBody.insertRow();
         rowData.forEach(cell => row.insertCell().textContent = cell);
-       while (row.cells.length < 6) row.insertCell().textContent = ''; 
     });
 
     const totalsBody = document.getElementById("woolTypeTotals").querySelector("tbody");
@@ -258,7 +257,7 @@ function newStartDay() {
     row.classList.add("day-separator");
     row.setAttribute('data-separator-date', new Date().toDateString());
     const cell = row.insertCell(0);
-    cell.colSpan = 6;
+    cell.colSpan = 5;
     cell.innerHTML = "&nbsp;";
     storeFarmData(document.getElementById("station").value.trim());
     location.reload();
@@ -267,16 +266,12 @@ function newStartDay() {
 function logBale(qrText) {
     playFeedback();
     const table = document.getElementById("logTable").querySelector("tbody");
-    const noteInput = document.getElementById("note");
-    const note = noteInput ? noteInput.value.trim() : "";
     const row = table.insertRow();
     row.insertCell(0).textContent = baleCount;
     row.insertCell(1).textContent = qrText;
     row.insertCell(2).textContent = document.getElementById("presser").value;
     row.insertCell(3).textContent = document.getElementById("station").value;
     row.insertCell(4).textContent = new Date().toLocaleString();
-    row.insertCell(5).textContent = note;
-    if (noteInput) noteInput.value = "";
     sessionCount++;
     storeBaleCount(document.getElementById("station").value.trim(), baleCount);
     baleCount++;
@@ -408,11 +403,10 @@ function escapeCSV(str) {
 }
 
 function exportCSV() {
-    const rows = [["#", "Wool Type", "Presser", "Farm", "Timestamp", "Notes"]];
+    const rows = [["#", "Wool Type", "Presser", "Farm", "Timestamp"]];
     const table = document.getElementById("logTable").querySelector("tbody");
     for (let row of table.rows) {
         let cells = Array.from(row.cells).map(cell => cell.textContent);
-        while (cells.length < 6) cells.push('');
         rows.push(cells);
     }
 
