@@ -1,8 +1,10 @@
-const CACHE_NAME = 'sheariq-cache-v2';
+const CACHE_NAME = 'sheariq-cache-v3';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
+ './styles.css',
+  './config.js', 
   './icon-192.png',
 ];
 
