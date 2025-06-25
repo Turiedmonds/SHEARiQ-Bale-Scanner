@@ -7,8 +7,7 @@ This repository contains a progressive web app for scanning bale QR codes, track
 This PWA is a completely static site. There are no build tools or runtime dependencies required.
 
 1. Clone the repository.
-2. Copy `config.example.js` to `config.js` and replace `YOUR_CLIENT_ID_HERE` with your OAuth client ID.
-3. There are no Node dependencies to install, so you can skip `npm install`.
+2.There are no Node dependencies to install, so you can skip `npm install`.
 ## Serving Locally
 
 The app needs to be served over HTTP(S) to enable service worker features. You can use any static server. Example using Python:
