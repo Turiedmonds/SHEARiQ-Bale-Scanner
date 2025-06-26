@@ -1,31 +1,33 @@
 // Moved JavaScript from index.html
 let GoogleAuth;
-let googleApiReady = false;
 const SCOPE = 'https://www.googleapis.com/auth/drive.file';
 
-
-function handleClientLoad() {
-    gapi.load('client:auth2', () => {
-        gapi.auth2.init({
-            client_id: CONFIG.oauthClientId,
-            scope: SCOPE
-        }).then(() => {
-            GoogleAuth = gapi.auth2.getAuthInstance();
-            googleApiReady = true;
-            document.getElementById("signInButton").disabled = false;
-        }).catch(error => {
-            console.error(error);
-            alert("Google API initialization failed. Please check your setup.");
-        });
+function initClient() {
+    gapi.client.init({
+        apiKey: '', // Optional, can leave blank
+        clientId: CONFIG.oauthClientId,
+        scope: SCOPE,
+        discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
+    }).then(function () {
+        GoogleAuth = gapi.auth2.getAuthInstance();
+        if (GoogleAuth.isSignedIn.get()) {
+            console.log('Already signed in');
+        }
+        document.getElementById("signInButton").disabled = false;
     });
 }
 
+function handleClientLoad() {
+    gapi.load('client:auth2', initClient);
+}
+
 function signIn() {
-    if (!googleApiReady) {
+    if (!GoogleAuth) {
         alert("Google API still loading. Please try again.");
-        return Promise.reject("Google API not ready.");
+        handleClientLoad();
+        return Promise.reject("GoogleAuth not initialized");
     }
-    return GoogleAuth.signIn().then(() => {
+    return GoogleAuth.signIn().then(function() {
         console.log("Signed in successfully");
     });
 }
