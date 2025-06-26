@@ -606,7 +606,12 @@ if ('serviceWorker' in navigator) {
 }
 
 window.addEventListener('load', () => {
-    handleClientLoad();
+  // handleClientLoad will be triggered by the Google API script's onload
+    // handler declared in index.html. Guarded call here prevents errors when
+    // gapi has not yet loaded during the window load event.
+    if (window.gapi) {
+        handleClientLoad();
+    } 
     uploadPendingUploads();
     updatePendingUploadsCounter();
 
