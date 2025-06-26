@@ -39,7 +39,8 @@ function uploadFileToGoogleDrive(fileContent, fileName) {
         'mimeType': 'text/csv'
     };
 
-    const accessToken = gapi.auth.getToken().access_token;
+     const accessToken = GoogleAuth.currentUser.get()
+        .getAuthResponse().access_token;
     const form = new FormData();
     form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
     form.append('file', file);
