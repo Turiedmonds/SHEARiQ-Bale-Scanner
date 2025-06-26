@@ -14,6 +14,8 @@ function initClient() {
             console.log('Already signed in');
         }
         document.getElementById("signInButton").disabled = false;
+        uploadPendingUploads();
+        updatePendingUploadsCounter();
     });
 }
 
@@ -611,8 +613,7 @@ window.addEventListener('load', () => {
     // gapi has not yet loaded during the window load event.
     if (window.gapi) {
         handleClientLoad();
-    } 
-    uploadPendingUploads();
+     }
     updatePendingUploadsCounter();
 
     document.getElementById('signInButton').addEventListener('click', signIn);
