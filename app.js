@@ -1,5 +1,6 @@
 // Moved JavaScript from index.html
 let GoogleAuth;
+let googleApiReady = false;
 const SCOPE = 'https://www.googleapis.com/auth/drive.file';
 
 function initClient() {
@@ -10,12 +11,16 @@ function initClient() {
         discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
     }).then(function () {
         GoogleAuth = gapi.auth2.getAuthInstance();
+        googleApiReady = true;
         if (GoogleAuth.isSignedIn.get()) {
             console.log('Already signed in');
         }
         document.getElementById("signInButton").disabled = false;
         uploadPendingUploads();
         updatePendingUploadsCounter();
+        }).catch(function(error) {
+        console.error('Error initializing Google API:', error);
+        alert('Failed to initialize Google API. Please try again.');
     });
 }
 
