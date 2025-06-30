@@ -156,7 +156,11 @@ function getFarmKey(prefix, farmName) {
 function storeFarmData(farmName) {
     if (!farmName) return;
     const logBody = document.getElementById("logTable").querySelector("tbody");
-    const logData = Array.from(logBody.rows).map(r => Array.from(r.cells).map(c => c.textContent));
+    const logData = Array.from(logBody.rows).map(r => ({
+        cells: Array.from(r.cells).map(c => c.textContent),
+        separator: r.classList.contains('day-separator'),
+        date: r.getAttribute('data-separator-date') || ''
+    }));
     localStorage.setItem(getFarmKey('logData', farmName), JSON.stringify(logData));
 
     const totalsBody = document.getElementById("woolTypeTotals").querySelector("tbody");
@@ -171,9 +175,17 @@ function loadFarmData() {
     const logBody = document.getElementById("logTable").querySelector("tbody");
     logBody.innerHTML = '';
     const storedLogs = JSON.parse(localStorage.getItem(getFarmKey('logData', farmName)) || '[]');
-    storedLogs.forEach(rowData => {
+    storedLogs.forEach(rowInfo => { 
         const row = logBody.insertRow();
-        rowData.forEach(cell => row.insertCell().textContent = cell);
+        if (rowInfo.separator) {
+            row.classList.add('day-separator');
+            row.setAttribute('data-separator-date', rowInfo.date || '');
+            const cell = row.insertCell(0);
+            cell.colSpan = 5;
+            cell.innerHTML = '&nbsp;';
+        } else {
+            rowInfo.cells.forEach(text => row.insertCell().textContent = text);
+        }
     });
 
     const totalsBody = document.getElementById("woolTypeTotals").querySelector("tbody");
@@ -530,7 +542,7 @@ function rebuildWoolTypeTotals() {
     const counts = {};
     const logRows = document.getElementById("logTable").querySelector("tbody").rows;
     for (let row of logRows) {
-        if (row.classList.contains('day-separator')) continue;
+       if (row.classList.contains('day-separator') || row.cells.length < 2) continue;
         const type = row.cells[1].textContent.trim();
         if (type) counts[type] = (counts[type] || 0) + 1;
     }
