@@ -3,38 +3,32 @@ let GoogleAuth;
 let googleApiReady = false;
 const SCOPE = 'https://www.googleapis.com/auth/drive.file';
 
-function initClient() {
-   console.log('Initializing Google API client');
-    gapi.client.init({
-        apiKey: '', // Optional, can leave blank
+function initializeGapi() {
+  gapi.load('client:auth2', async () => {
+    try {
+      await gapi.client.init({
         clientId: CONFIG.oauthClientId,
-        scope: SCOPE,
-        discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
-    }).then(function () {
-        GoogleAuth = gapi.auth2.getAuthInstance();
-        googleApiReady = true;
-         console.log('Google API client initialized');
-        if (GoogleAuth.isSignedIn.get()) {
-            console.log('Already signed in');
-        }
-        document.getElementById("signInButton").disabled = false;
-        uploadPendingUploads();
-        updatePendingUploadsCounter();
-        }).catch(function(error) {
-        console.error('Error initializing Google API:', error);
-        alert('Failed to initialize Google API. Please try again.');
-    });
-}
-
-function handleClientLoad() {
- console.log('Google API script loaded'); 
-    gapi.load('client:auth2', initClient);
+     scope: SCOPE
+      });
+      GoogleAuth = gapi.auth2.getAuthInstance();
+      googleApiReady = true;
+      console.log('Google API initialized');
+      document.getElementById('signInButton').disabled = false;
+      uploadPendingUploads();
+      updatePendingUploadsCounter();
+    } catch (e) {
+      alert('Failed to initialize Google API. Please try again.');
+      console.error(e);
+    }
+  });   
 }
 
 function signIn() {
     if (!GoogleAuth) {
         alert("Google API still loading. Please try again.");
-        handleClientLoad();
+         if (window.gapi && !googleApiReady) {
+            initializeGapi();
+        }
         return Promise.reject("GoogleAuth not initialized");
     }
     return GoogleAuth.signIn().then(function() {
@@ -628,12 +622,10 @@ if ('serviceWorker' in navigator) {
 }
 
 window.addEventListener('load', () => {
-  // handleClientLoad will be triggered by the Google API script's onload
-    // handler declared in index.html. Guarded call here prevents errors when
-    // gapi has not yet loaded during the window load event.
+ 
     if (window.gapi) {
-        handleClientLoad();
-     }
+      initializeGapi();
+    }  
     updatePendingUploadsCounter();
 
     document.getElementById('signInButton').addEventListener('click', signIn);
