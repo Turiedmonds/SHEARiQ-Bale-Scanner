@@ -4,6 +4,7 @@ let googleApiReady = false;
 const SCOPE = 'https://www.googleapis.com/auth/drive.file';
 
 function initClient() {
+   console.log('Initializing Google API client');
     gapi.client.init({
         apiKey: '', // Optional, can leave blank
         clientId: CONFIG.oauthClientId,
@@ -12,6 +13,7 @@ function initClient() {
     }).then(function () {
         GoogleAuth = gapi.auth2.getAuthInstance();
         googleApiReady = true;
+         console.log('Google API client initialized');
         if (GoogleAuth.isSignedIn.get()) {
             console.log('Already signed in');
         }
@@ -25,6 +27,7 @@ function initClient() {
 }
 
 function handleClientLoad() {
+ console.log('Google API script loaded'); 
     gapi.load('client:auth2', initClient);
 }
 
