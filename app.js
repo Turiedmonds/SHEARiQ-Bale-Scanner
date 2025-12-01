@@ -1,113 +1,4 @@
 // Moved JavaScript from index.html
-let GoogleAuth;
-let googleApiReady = false;
-const SCOPE = 'https://www.googleapis.com/auth/drive.file';
-
-function initializeGapi() {
-  gapi.load('client:auth2', async () => {
-    try {
-      await gapi.client.init({
-        clientId: CONFIG.oauthClientId,
-     scope: SCOPE
-      });
-      GoogleAuth = gapi.auth2.getAuthInstance();
-      googleApiReady = true;
-      console.log('Google API initialized');
-      document.getElementById('signInButton').disabled = false;
-      uploadPendingUploads();
-      updatePendingUploadsCounter();
-    } catch (e) {
-      alert('Failed to initialize Google API. Please try again.');
-      console.error(e);
-    }
-  });   
-}
-
-function signIn() {
-    if (!GoogleAuth) {
-        alert("Google API still loading. Please try again.");
-         if (window.gapi && !googleApiReady) {
-            initializeGapi();
-        }
-        return Promise.reject("GoogleAuth not initialized");
-    }
-    return GoogleAuth.signIn().then(function() {
-        console.log("Signed in successfully");
-    });
-}
-
-function uploadFileToGoogleDrive(fileContent, fileName) {
-    const file = new Blob([fileContent], { type: 'text/csv' });
-    const metadata = {
-        'name': fileName,
-        'mimeType': 'text/csv'
-    };
-
-     const accessToken = GoogleAuth.currentUser.get()
-        .getAuthResponse().access_token;
-    const form = new FormData();
-    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-    form.append('file', file);
-
-    fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
-        method: 'POST',
-        headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
-        body: form
-    }).then(response => response.json())
-    .then(result => {
-        console.log('File uploaded successfully. File ID: ' + result.id);
-        alert('File uploaded successfully to Google Drive.');
-    }).catch(error => {
-        console.error('Error uploading file: ', error);
-        alert('Upload failed. File saved locally for later upload.');
-        savePendingUpload(fileContent, fileName);
-    });
-}
-
-const PENDING_UPLOADS_KEY = 'pendingUploads';
-
-function updatePendingUploadsCounter() {
-    const count = JSON.parse(localStorage.getItem(PENDING_UPLOADS_KEY) || '[]').length;
-    const el = document.getElementById('pendingUploadsCounter');
-    if (el) el.textContent = 'Pending Uploads: ' + count;
-}
-
-function savePendingUpload(content, name) {
-    const pending = JSON.parse(localStorage.getItem(PENDING_UPLOADS_KEY) || '[]');
-    pending.push({ fileName: name, fileContent: content });
-    localStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(pending));
-    updatePendingUploadsCounter();
-}
-
-function uploadPendingUploads() {
-    if (!navigator.onLine) return;
-    const pending = JSON.parse(localStorage.getItem(PENDING_UPLOADS_KEY) || '[]');
-    if (!pending.length) return;
-
-    const ensureSignIn = GoogleAuth && GoogleAuth.isSignedIn.get()
-        ? Promise.resolve()
-        : signIn();
-
-    ensureSignIn.then(() => {
-        const remaining = [];
-        pending.forEach(item => {
-            try {
-                uploadFileToGoogleDrive(item.fileContent, item.fileName);
-            } catch (e) {
-                console.error('Upload failed for', item.fileName, e);
-                remaining.push(item);
-            }
-        });
-        if (remaining.length) {
-            localStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(remaining));
-        } else {
-            localStorage.removeItem(PENDING_UPLOADS_KEY);
-        }
-        updatePendingUploadsCounter();
-    });
-}
-
-window.addEventListener('online', uploadPendingUploads);
 
 let baleCount = 0;
 let sessionCount = 0;
@@ -446,19 +337,7 @@ function exportCSV() {
     const fileName = `${farmName.replace(/\s+/g, '_')}_${dateStr}.csv`;
     a.setAttribute("download", fileName);
     a.click();
-
-    if (!navigator.onLine) {
-        savePendingUpload(csvContent, fileName);
-        return;
-    }
-
-    if (GoogleAuth && GoogleAuth.isSignedIn.get()) {
-        uploadFileToGoogleDrive(csvContent, fileName);
-    } else {
-        signIn().then(() => uploadFileToGoogleDrive(csvContent, fileName))
-               .catch(() => savePendingUpload(csvContent, fileName));
-    }
-  shareCSV(csvContent, fileName);
+    shareCSV(csvContent, fileName);
 }
 
 function shareCSV(csvContent, fileName) {
@@ -622,13 +501,6 @@ if ('serviceWorker' in navigator) {
 }
 
 window.addEventListener('load', () => {
- 
-    if (window.gapi) {
-      initializeGapi();
-    }  
-    updatePendingUploadsCounter();
-
-    document.getElementById('signInButton').addEventListener('click', signIn);
     document.querySelector('.new-day-button').addEventListener('click', newStartDay);
     document.getElementById('resetAllButton').addEventListener('click', resetAllFarms);
     document.getElementById('station').addEventListener('change', loadFarmData);
