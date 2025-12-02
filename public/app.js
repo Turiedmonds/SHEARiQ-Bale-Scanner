@@ -5,6 +5,7 @@ let sessionCount = 0;
 let baleCountSet = false;
 let videoStream = null;
 let animationFrameId = null;
+let farmUnsubscribe = null;
 
 // Function to insert a new day separator row
 function insertDaySeparatorRow(body) {
@@ -91,6 +92,57 @@ function loadFarmData() {
         sessionCount = logBody.rows.length;
         baleCountSet = true;
         updateDisplays();
+    }
+}
+
+function rebuildLogFromEntries(entries) {
+    const logBody = document.getElementById("logTable").querySelector("tbody");
+    logBody.innerHTML = '';
+
+    entries.forEach(entry => {
+        const row = logBody.insertRow();
+        row.insertCell(0).textContent = entry.baleNumber;
+        row.insertCell(1).textContent = entry.woolType;
+        row.insertCell(2).textContent = entry.presser;
+        row.insertCell(3).textContent = entry.farmName;
+        row.insertCell(4).textContent = new Date(entry.timestamp).toLocaleString();
+    });
+
+    rebuildWoolTypeTotals();
+    recalcBaleCounts();
+    const farmName = (entries[0] && entries[0].farmName) || document.getElementById("station").value.trim();
+    storeFarmData(farmName);
+}
+
+function subscribeToFarmBales(farmName) {
+    const trimmedFarmName = (farmName || '').trim();
+    if (!trimmedFarmName) return;
+
+    if (!window.db) {
+        console.warn('Firestore is not available: db instance missing.');
+        return;
+    }
+
+    if (farmUnsubscribe) {
+        farmUnsubscribe();
+        farmUnsubscribe = null;
+    }
+
+    try {
+        farmUnsubscribe = window.db
+            .collection('baleLogs')
+            .doc(trimmedFarmName)
+            .collection('bales')
+            .orderBy('timestamp', 'asc')
+            .onSnapshot(snapshot => {
+                const entries = [];
+                snapshot.forEach(doc => entries.push(doc.data()));
+                rebuildLogFromEntries(entries);
+            }, error => {
+                console.error('Error receiving Firestore bale updates:', error);
+            });
+    } catch (error) {
+        console.error('Error subscribing to Firestore bale logs:', error);
     }
 }
 
@@ -534,6 +586,10 @@ window.addEventListener('load', () => {
     document.querySelector('.new-day-button').addEventListener('click', newStartDay);
     document.getElementById('resetAllButton').addEventListener('click', resetAllFarms);
     document.getElementById('station').addEventListener('change', loadFarmData);
+    document.getElementById('station').addEventListener('change', () => {
+        const farmName = document.getElementById('station').value.trim();
+        subscribeToFarmBales(farmName);
+    });
     document.getElementById('setStartButton').addEventListener('click', setStartingBale);
     document.getElementById('resetFarmButton').addEventListener('click', resetThisFarmSession);
     document.getElementById('startScanBtn').addEventListener('click', startQRScan);
