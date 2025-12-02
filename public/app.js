@@ -173,19 +173,45 @@ function newStartDay() {
 
 function logBale(qrText) {
     playFeedback();
+    const farmName = document.getElementById("station").value.trim();
+    const entry = {
+        baleNumber: baleCount,
+        woolType: qrText.trim(),
+        presser: document.getElementById("presser").value,
+        farmName,
+        timestamp: new Date().toISOString()
+    };
     const table = document.getElementById("logTable").querySelector("tbody");
     const row = table.insertRow();
-    row.insertCell(0).textContent = baleCount;
-    row.insertCell(1).textContent = qrText;
-    row.insertCell(2).textContent = document.getElementById("presser").value;
-    row.insertCell(3).textContent = document.getElementById("station").value;
-    row.insertCell(4).textContent = new Date().toLocaleString();
+    row.insertCell(0).textContent = entry.baleNumber;
+    row.insertCell(1).textContent = entry.woolType;
+    row.insertCell(2).textContent = entry.presser;
+    row.insertCell(3).textContent = entry.farmName;
+    row.insertCell(4).textContent = new Date(entry.timestamp).toLocaleString();
     sessionCount++;
-    storeBaleCount(document.getElementById("station").value.trim(), baleCount);
+    storeBaleCount(entry.farmName, baleCount);
     baleCount++;
     updateDisplays();
-    updateWoolTypeTotals(qrText.trim());
-    storeFarmData(document.getElementById("station").value.trim());
+    updateWoolTypeTotals(entry.woolType);
+    storeFarmData(entry.farmName);
+    saveBaleToFirestore(entry);
+}
+
+async function saveBaleToFirestore(entry) {
+    if (!entry || !(entry.farmName || '').trim()) return;
+
+    if (!(window.firebase && firebase.firestore)) {
+        console.warn('Firestore is not available. Entry not saved to remote log.');
+        return;
+    }
+
+    try {
+        const farmName = entry.farmName.trim();
+        const db = firebase.firestore();
+        await db.collection(`baleLogs/${farmName}`).add(entry);
+    } catch (error) {
+        console.error('Failed to save bale entry to Firestore:', error);
+    }
 }
 
 function startQRScan() {
