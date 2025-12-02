@@ -173,19 +173,49 @@ function newStartDay() {
 
 function logBale(qrText) {
     playFeedback();
+    const entry = {
+        baleNumber: baleCount,
+        woolType: qrText.trim(),
+        presser: document.getElementById("presser").value,
+        farmName: document.getElementById("station").value.trim(),
+        timestamp: new Date().toISOString()
+    };
     const table = document.getElementById("logTable").querySelector("tbody");
     const row = table.insertRow();
-    row.insertCell(0).textContent = baleCount;
-    row.insertCell(1).textContent = qrText;
-    row.insertCell(2).textContent = document.getElementById("presser").value;
-    row.insertCell(3).textContent = document.getElementById("station").value;
-    row.insertCell(4).textContent = new Date().toLocaleString();
+    row.insertCell(0).textContent = entry.baleNumber;
+    row.insertCell(1).textContent = entry.woolType;
+    row.insertCell(2).textContent = entry.presser;
+    row.insertCell(3).textContent = entry.farmName;
+    row.insertCell(4).textContent = new Date(entry.timestamp).toLocaleString();
     sessionCount++;
-    storeBaleCount(document.getElementById("station").value.trim(), baleCount);
+    storeBaleCount(entry.farmName, baleCount);
     baleCount++;
     updateDisplays();
-    updateWoolTypeTotals(qrText.trim());
-    storeFarmData(document.getElementById("station").value.trim());
+    updateWoolTypeTotals(entry.woolType);
+    storeFarmData(entry.farmName);
+    saveBaleToFirestore(entry);
+}
+
+async function saveBaleToFirestore(entry) {
+    if (!entry || !entry.farmName || entry.farmName.trim() === '') return;
+
+    if (!window.db) {
+        console.warn('Firestore is not available: db instance missing.');
+        return;
+    }
+
+    const farmDocId = entry.farmName.trim();
+
+    try {
+        await window.db
+            .collection('baleLogs')
+            .doc(farmDocId)
+            .collection('bales')
+            .add(entry);
+        console.log(`Bale entry saved for farm: ${farmDocId}`);
+    } catch (error) {
+        console.error('Error saving bale entry to Firestore:', error);
+    }
 }
 
 function startQRScan() {
