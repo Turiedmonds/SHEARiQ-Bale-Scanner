@@ -1,12 +1,12 @@
 // Firebase configuration for the SHEΔR iQ Bale Scanner PWA
 // Note: firebaseConfig values must remain unchanged.
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
+  apiKey: "AIzaSyDCjhgvsSzW9bmM9dF_vQB-FxwTyv6kU60",
   authDomain: "sheariq-bale-scanner.firebaseapp.com",
   projectId: "sheariq-bale-scanner",
-  storageBucket: "sheariq-bale-scanner.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  storageBucket: "sheariq-bale-scanner.firebasestorage.app",
+  messagingSenderId: "453546913124",
+  appId: "1:453546913124:web:717105eeef2dbd15c1de71"
 };
 
 // Initialize Firebase app only once
